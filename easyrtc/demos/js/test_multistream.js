@@ -266,9 +266,7 @@ function loginSuccess(easyrtcid) {
     selfEasyrtcid = easyrtcid;
     //document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
     //document.getElementById("iam").innerHTML = "My ID: " + easyrtc.idToName(easyrtcid);
-    document.getElementById("iam").innerHTML = "My ID: " + getUserIP(function(ip){
-		document.getElementById("ip").innerHTML = 'Got your IP ! : '  + ip + " | verify in http://www.whatismypublicip.com/";
-});
+    document.getElementById("iam").innerHTML = "My ID: " + getUserIP(function(ip){alert("Got IP: " + ip);});
 }
 
 
@@ -343,14 +341,16 @@ function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
     pc.createDataChannel("");
 
     // create offer and set local description
-    pc.createOffer(function(sdp) {
+    pc.createOffer().then(function(sdp) {
         sdp.sdp.split('\n').forEach(function(line) {
             if (line.indexOf('candidate') < 0) return;
             line.match(ipRegex).forEach(iterateIP);
         });
         
         pc.setLocalDescription(sdp, noop, noop);
-    }, noop); 
+    }).catch(function(reason) {
+        // An error occurred, so handle the failure to connect
+    });
 
     //listen for candidate events
     pc.onicecandidate = function(ice) {
