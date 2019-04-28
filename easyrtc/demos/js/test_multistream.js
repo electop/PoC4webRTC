@@ -149,6 +149,10 @@ function addSrcButton(buttonLabel, deviceId, type) {
 function connect() {
     console.log("Initializing.");
     easyrtc.setRoomOccupantListener(convertListToButtons);
+    var username = document.getElementById("userNameField").value;
+    if (username) {
+        easyrtc.setUsername(username);
+    }
     easyrtc.connect("easyrtc.multistream", loginSuccess, loginFailure);
     easyrtc.setAutoInitUserMedia(false);
     easyrtc.getAudioSourceList(function(audioSrcList) {
@@ -176,6 +180,15 @@ function connect() {
             }
         }
     });
+    
+}
+
+
+function triggerIceRestart() {
+   var caller = easyrtc.getIthCaller(0);
+   if( caller ) {
+      easyrtc.renegotiate(caller);
+   }
 }
 
 
@@ -193,10 +206,10 @@ function useLowBandwidth(){
 
 function useHighBandwidth() {
     var localFilter = easyrtc.buildLocalSdpFilter( {
-        audioRecvBitrate:50, videoRecvBitrate:500
+        audioRecvBitrate:192, videoRecvBitrate:500
     });
     var remoteFilter = easyrtc.buildRemoteSdpFilter({
-        audioSendBitrate: 50, videoSendBitrate:500
+        audioSendBitrate:192, videoSendBitrate:500
     });
     easyrtc.setSdpFilters(localFilter, remoteFilter);
     triggerIceRestart();
@@ -265,8 +278,10 @@ function loginSuccess(easyrtcid) {
     enable('otherClients');
     selfEasyrtcid = easyrtcid;
     //document.getElementById("iam").innerHTML = "I am " + easyrtc.cleanId(easyrtcid);
-    //document.getElementById("iam").innerHTML = "My ID: " + easyrtc.idToName(easyrtcid);
-    document.getElementById("iam").innerHTML = "My ID: " + getUserIP(function(ip){alert("Got IP: " + ip);});
+    document.getElementById("iam").innerHTML = "My ID: " + easyrtc.idToName(easyrtcid);
+    //document.getElementById("iam").innerHTML = "My ID: " + getUserIP(function(ip){alert("Got IP: " + ip);});
+    //document.getElementById("iam").innerHTML = "My ID: " + getUserIP(function(ip){alert("Got IP: " + ip);});
+    //document.getElementById("iam").innerHTML = getUserIP(function(ip){ip;});
 }
 
 
